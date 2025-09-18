@@ -1,6 +1,6 @@
 import Page from '../../vaah-webdriverio/Page.js'
 
-class ProductDescription extends Page {
+class Trolley extends Page{
     constructor() {
         super();
         this.params = {
@@ -10,12 +10,12 @@ class ProductDescription extends Page {
             }
         }
         this.element = {
-            product_delivery_btn_test_id: 'pdp-forgefast-universele-schroeven-platkop-voldraad-geel-delivery-btn',
-            trolley_add_btn_test_id: 'trolley-add-ons-recommendations-go-to-trolley-btn',
+            trolley_checkout_btn_test_id: 'trolley-continue-checkout-cta',
+            
         }
         this.value = {
         }
     }
 }
 
-export default new ProductDescription();
+export default new Trolley();

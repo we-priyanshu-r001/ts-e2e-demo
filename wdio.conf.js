@@ -201,8 +201,56 @@ export const config = {
      * @param {Array.<String>} specs        List of spec file paths that are to be run
      * @param {object}         browser      instance of created browser/device session
      */
-    // before: function (capabilities, specs) {
-    // },
+    before: function () {
+        browser.addCommand('waitForNetworkIdle', async function (options = {}) {
+            const { timeout = 10000, idleTime = 500 } = options;
+
+            // Inject tracker if not already present
+            await browser.execute(() => {
+            if (!window.__pendingRequests) {
+                window.__pendingRequests = 0;
+
+                const origFetch = window.fetch;
+                window.fetch = function (...args) {
+                window.__pendingRequests++;
+                return origFetch.apply(this, args).finally(() => {
+                    window.__pendingRequests--;
+                });
+                };
+
+                const origOpen = XMLHttpRequest.prototype.open;
+                const origSend = XMLHttpRequest.prototype.send;
+
+                XMLHttpRequest.prototype.open = function (...args) {
+                this.addEventListener('loadend', () => {
+                    window.__pendingRequests--;
+                });
+                return origOpen.apply(this, args);
+                };
+
+                XMLHttpRequest.prototype.send = function (...args) {
+                window.__pendingRequests++;
+                return origSend.apply(this, args);
+                };
+            }
+            });
+
+            // Now wait until network is idle
+            await browser.waitUntil(
+            async () => {
+                const pending = await browser.execute(() => window.__pendingRequests);
+                return pending === 0;
+            },
+            {
+                timeout,
+                timeoutMsg: `Network did not go idle within ${timeout}ms`,
+            }
+            );
+
+            // Optionally ensure it stays idle for a bit
+            await browser.pause(idleTime);
+        });
+    },
     /**
      * Runs before a WebdriverIO command gets executed.
      * @param {string} commandName hook command name

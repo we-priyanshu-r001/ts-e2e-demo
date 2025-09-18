@@ -29,7 +29,7 @@ class Home extends Page{
                 tests: [
                     {
                         count: 1.1,
-                        name: "Verify We're able to load Home Page",
+                        name: "Verify We're able to Checkout",
                         // expect: "The URL should be: "+this.params.page.url,
                         // assert: this.params.page.url
                     }
