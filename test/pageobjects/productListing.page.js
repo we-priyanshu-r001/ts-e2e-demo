@@ -10,6 +10,7 @@ class ProductListingPage extends Page {
     
     async openPDP(){
         const product_card = await Sl.testid(ProductListing.element.product_card_test_id)
+        await Helper.scrollIntoView(product_card);
         await Helper.waitForClickable(product_card, this.long_pause);
         await product_card.click();
         await browser.pause(this.medium_pause);
